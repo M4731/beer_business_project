@@ -248,13 +248,24 @@ SET description_ = 'Sandwitches' ,
     price = 3.5
 WHERE food_id = 2; 
 
-commit;
+commit; 
 
-
+select * from contract;
+select * from beer;
+select * from merchants;
+select * from food;
                 
+INSERT INTO contract
+VALUES (3,3,sysdate, to_date('2021-12-8','yy-mm-dd'), 55, 2, 15);
                 
+INSERT INTO contract
+VALUES (3,1,sysdate, to_date('2021-2-1','yy-mm-dd'), 50, 2, 15);               
                 
+INSERT INTO contract
+VALUES (3,4,sysdate, to_date('2021-2-1','yy-mm-dd'), 20, null, null);                
                 
+INSERT INTO contract
+VALUES (2,4,sysdate, to_date('2021-6-1','yy-mm-dd'), 30, null, null);                
                 
-                
-                
+INSERT INTO contract
+VALUES (2,3,sysdate, to_date('2021-6-8','yy-mm-dd'), 75, 1, 25);
