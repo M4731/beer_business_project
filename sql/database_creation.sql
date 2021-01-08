@@ -269,3 +269,16 @@ VALUES (2,4,sysdate, to_date('2021-6-1','yy-mm-dd'), 30, null, null);
                 
 INSERT INTO contract
 VALUES (2,3,sysdate, to_date('2021-6-8','yy-mm-dd'), 75, 1, 25);
+
+select * from beermaker;
+
+ALTER TABLE beermaker
+ADD starting_price NUMBER(5,2) DEFAULT 0.75;
+
+UPDATE beermaker
+SET starting_price = 1
+WHERE beermaker_id = 2;
+
+UPDATE beermaker
+SET starting_price = 1.25
+WHERE beermaker_id = 3;
