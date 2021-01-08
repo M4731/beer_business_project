@@ -250,10 +250,13 @@ WHERE food_id = 2;
 
 commit; 
 
+select * from beer_types;
 select * from contract;
 select * from beer;
+select * from beermaker;
 select * from merchants;
 select * from food;
+select * from locations;
                 
 INSERT INTO contract
 VALUES (3,3,sysdate, to_date('2021-12-8','yy-mm-dd'), 55, 2, 15);
@@ -282,3 +285,15 @@ WHERE beermaker_id = 2;
 UPDATE beermaker
 SET starting_price = 1.25
 WHERE beermaker_id = 3;
+
+select * from beer;
+select * from rating;
+
+INSERT INTO rating
+VALUES(sec_rating.NEXTVAL, 6, 'decent');
+
+INSERT INTO rating
+VALUES(sec_rating.NEXTVAL, 10, 'exceptional');
+
+INSERT INTO rating
+VALUES(sec_rating.NEXTVAL, 9, 'great');
