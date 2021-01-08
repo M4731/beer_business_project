@@ -192,6 +192,61 @@ VALUES(4, 3, 'brown beer tastes well with fish.');
 select * from good_with_food;
 desc good_with_foods;
 
+---------------------- 
+
+select * from food;
+
+ALTER TABLE food
+ADD price NUMBER(5,2) DEFAULT 0;
+
+UPDATE food
+SET price = 4 
+WHERE food_id = 1; 
+
+UPDATE food
+SET price = 6 
+WHERE food_id = 2; 
+
+UPDATE food
+SET price = 5.7 
+WHERE food_id = 3; 
+
+select * from contract;
+
+ALTER TABLE contract
+ADD food_id NUMBER(4) REFERENCES food(food_id);
+
+ALTER TABLE contract
+ADD food_quantity NUMBER(5);
+
+UPDATE contract
+SET food_id = 3 
+WHERE beer_id = 4 AND merchant_id = 4; 
+
+UPDATE contract
+SET food_quantity = 10 
+WHERE beer_id = 4 AND merchant_id = 4; 
+
+select * from merchants;
+
+UPDATE merchants
+SET merchant_name = 'Rustic' 
+WHERE merchant_id = 1; 
+
+UPDATE merchants
+SET merchant_name = 'Galeo' 
+WHERE merchant_id = 2; 
+
+UPDATE merchants
+SET merchant_name = 'Fantastique' 
+WHERE merchant_id = 3; 
+
+select * from food;
+
+UPDATE food
+SET description_ = 'Sandwitches' ,
+    price = 3.5
+WHERE food_id = 2; 
 
 commit;
 
