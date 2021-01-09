@@ -11,6 +11,10 @@ AS
     --profitul scos dintr-o anumita bere pe luna
     FUNCTION monthly_profit(v_bere beer.beer_id%TYPE)
     RETURN NUMBER;
+    
+    --afisati numele fiecarei beri, numele locatiei in care este produsa, numele producatorului, cantitatea cumparate un merchant al carui nume este dat, , dar si fiecare fel de mancare si cantitatea mancarii comandata de acesta. –toate informatiile utile legate de cererea unui merchant.
+    PROCEDURE usefull_information(v_mer merchants.merchant_name%TYPE);
+    
 END p_pachet1;
 /
 
@@ -163,7 +167,92 @@ AS
         THEN
             RAISE_APPLICATION_ERROR(-20001,'The introduced beer does not sell at the moment.');    
     END;
-  
+    
+    
+    
+    --afisati numele fiecarei beri, numele locatiei in care este produsa, numele producatorului, cantitatea cumparate un merchant al carui nume este dat, , dar si fiecare fel de mancare si cantitatea mancarii comandata de acesta. –toate informatiile utile legate de cererea unui merchant.
+    PROCEDURE usefull_information(v_mer merchants.merchant_name%TYPE)
+    IS
+        v_name beer.beer_name%TYPE;
+        v_bmname beermaker.beermaker_name%TYPE;
+        v_con locations.country%TYPE;
+        v_food food.description_%TYPE;
+        v_fcount NUMBER;
+        v_nr NUMBER;
+        v_bcount NUMBER;
+        v_merchant merchants.merchant_id%TYPE;
+    BEGIN
+        SELECT merchant_id INTO v_merchant
+        FROM merchants
+        WHERE lower(merchant_name) = lower(v_mer);
+        
+        SELECT count(beer_id) INTO v_nr
+               FROM contract
+               WHERE merchant_id = v_merchant;
+    
+        IF v_nr > 0 
+        THEN 
+            DBMS_OUTPUT.PUT_LINE('The merchant ' || v_merchant || ' ' || INITCAP(v_mer) || ' buys:');
+        
+            FOR i IN (SELECT beer_id
+                      FROM contract
+                      WHERE merchant_id = v_merchant)
+            LOOP
+                SELECT beer_name, beermaker_name, country INTO v_name, v_bmname, v_con
+                FROM beer b JOIN beermaker bm ON b.beermaker_id = bm.beermaker_id
+                            JOIN locations l ON bm.location_id = l.location_id
+                WHERE beer_id = i.beer_id;
+                
+                SELECT sum(beer_quantity) INTO v_bcount
+                FROM contract
+                WHERE merchant_id = v_merchant AND beer_id = i.beer_id;
+                
+                DBMS_OUTPUT.PUT_LINE(v_bcount || ' ' || INITCAP(v_name) || ' made by ' || INITCAP(v_bmname) || ' in ' || INITCAP(v_con));
+                END LOOP;
+            
+            SELECT count(food_id) INTO v_fcount
+                   FROM contract
+                   WHERE merchant_id = v_merchant;
+            
+            IF v_fcount > 0
+            THEN
+                DBMS_OUTPUT.PUT('And food: ');
+                
+                FOR i IN (SELECT food_id
+                          FROM contract
+                          WHERE merchant_id = v_merchant)
+                LOOP
+                    IF i.food_id is not null
+                    THEN
+                        SELECT description_ INTO v_food
+                        FROM food 
+                        WHERE food_id = i.food_id;
+                        
+                        SELECT sum(beer_quantity) INTO v_bcount
+                        FROM contract
+                        WHERE merchant_id = v_merchant AND food_id = i.food_id;
+                        
+                        DBMS_OUTPUT.PUT(v_bcount || ' ' ||v_food || ' ');
+                    END IF;
+                END LOOP;
+                
+                DBMS_OUTPUT.NEW_LINE;
+            ELSE
+                DBMS_OUTPUT.PUT_LINE('And they do not buy any food.');
+            END IF;
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('The merchant ' || v_merchant || ' ' || INITCAP(v_mer) || ' does not buy anything.');
+        END IF;
+        
+    EXCEPTION
+        WHEN NO_DATA_FOUND
+        THEN
+            RAISE_APPLICATION_ERROR(-20001,'The introduced merchant in not our database.');
+        WHEN TOO_MANY_ROWS
+        THEN
+            RAISE_APPLICATION_ERROR(-20002,'The introduced name defines more than one merchants on our database.');
+ 
+     END;
 END p_pachet1;
 /
 
@@ -201,13 +290,20 @@ BEGIN
 END;
 /
 
+SELECT * FROM merchants;
 
+EXECUTE p_pachet1.usefull_information('Galeo');
+EXECUTE p_pachet1.usefull_information('fantastique');
+EXECUTE p_pachet1.usefull_information('funny_store');
+EXECUTE p_pachet1.usefull_information('Rustic');
+EXECUTE p_pachet1.usefull_information('SEAFOOD_JOE');
+EXECUTE p_pachet1.usefull_information('test');
 
+INSERT INTO merchants
+VALUES(6,'test');
 
-
-
-
-
+INSERT INTO merchants
+VALUES(7,'test');
 
 
 
