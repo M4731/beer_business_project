@@ -1,6 +1,6 @@
 # beer_business_project
 
-This repository is representing an university project.<br/>
+This repository is an university project.<br/>
 The point of the project is making a database that represents a beer business. <br/>
   - The company buys beer directly from producers and it sells it to various merchants at a higher price. <br/>
   - The company also produces food. <br/>
