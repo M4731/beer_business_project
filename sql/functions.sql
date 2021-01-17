@@ -306,6 +306,158 @@ INSERT INTO merchants
 VALUES(7,'test');
 
 
+--------------------------------------------------
+
+CREATE OR REPLACE PACKAGE p_rating
+IS
+    FUNCTION f_beer(bere beer.beer_id %TYPE)
+    RETURN NUMBER;
+    
+    PROCEDURE p_beer;
+    
+    FUNCTION f_type(tip beer_types.type_ %TYPE)
+    RETURN NUMBER;
+    
+    PROCEDURE p_type;
+    
+    FUNCTION f_beermaker(bm beermaker.beermaker_id%TYPE)
+    RETURN NUMBER;
+    
+    PROCEDURE p_beermaker;
+END;
+/
+
+
+select * from rating;
+select * from beer;
+select * from beermaker;
+select * from beer_types;
+select * from locations;
+
+CREATE OR REPLACE PACKAGE BODY p_rating
+IS
+    FUNCTION f_beer(bere beer.beer_id %TYPE)
+    RETURN NUMBER
+    IS
+        v_return NUMBER;
+    BEGIN
+        SELECT grade INTO v_return
+        FROM beer b JOIN rating r USING(rating_id)
+        WHERE beer_id = bere;
+        
+        --DBMS_OUTPUT.PUT_LINE(v_return);
+        RETURN v_return;
+    EXCEPTION 
+        WHEN NO_DATA_FOUND
+        THEN
+            RAISE_APPLICATION_ERROR(-20001,'The introduced code does not define a beer in our database.');
+        
+    END;
+
+    PROCEDURE p_beer
+    IS
+        v_return NUMBER;
+    BEGIN 
+        FOR i IN (SELECT beer_id, beer_name
+                  FROM beer)
+        LOOP
+            DBMS_OUTPUT.PUT(i.beer_name);
+            DBMS_OUTPUT.PUT(' ');
+            v_return := p_rating.f_beer(i.beer_id);
+            DBMS_OUTPUT.PUT(v_return);
+            DBMS_OUTPUT.NEW_LINE;
+            
+        END LOOP;
+    END;
+    
+    FUNCTION f_type(tip beer_types.type_ %TYPE)
+    RETURN NUMBER
+    IS
+        v_return NUMBER;
+    BEGIN
+        SELECT round(avg(r.grade),2) INTO v_return
+        FROM beer b JOIN beer_types bt ON b.type_ = bt.type_
+                     JOIN rating r ON r.rating_id = b.rating_id
+        WHERE lower(bt.type_) = lower(tip);
+        
+        --DBMS_OUTPUT.PUT_LINE(v_return);
+        RETURN v_return;
+        
+    EXCEPTION 
+        WHEN NO_DATA_FOUND
+        THEN
+            RAISE_APPLICATION_ERROR(-20001,'The introduced type does is not in our database.');
+    END;
+    
+    
+    PROCEDURE p_type
+    IS
+        v_return NUMBER;
+    BEGIN 
+        FOR i IN (SELECT UNIQUE bt.type_
+                  FROM beer b JOIN beer_types bt ON bt.type_ = b.type_)
+        LOOP
+            DBMS_OUTPUT.PUT(i.type_);
+            DBMS_OUTPUT.PUT(' ');
+            v_return := p_rating.f_type(i.type_);
+            DBMS_OUTPUT.PUT(v_return);
+            DBMS_OUTPUT.NEW_LINE;
+            
+        END LOOP;
+    END;
+    
+    FUNCTION f_beermaker(bm beermaker.beermaker_id%TYPE)
+    RETURN NUMBER
+    IS
+        v_return NUMBER;
+    BEGIN
+        SELECT round(avg(r.grade),2) INTO v_return
+        FROM beer b JOIN beermaker bg ON b.beermaker_id = bg.beermaker_id
+                    JOIN rating r ON r.rating_id = b.rating_id
+        WHERE bg.beermaker_id = bm;
+        
+        --DBMS_OUTPUT.PUT_LINE(v_return);
+        RETURN v_return;
+        
+    EXCEPTION 
+        WHEN NO_DATA_FOUND
+        THEN
+            RAISE_APPLICATION_ERROR(-20001,'The introduced id does not define a beermaker in our database.');
+    END;
+    
+    PROCEDURE p_beermaker
+    IS
+        v_return NUMBER;
+    BEGIN 
+        DBMS_OUTPUT.PUT_LINE('Beers that have ratings in the database: ');
+        FOR i IN (SELECT UNIQUE bm.beermaker_id, bm.beermaker_name
+                  FROM beer b JOIN beermaker bm ON bm.beermaker_id = b.beermaker_id)
+        LOOP
+            DBMS_OUTPUT.PUT(i.beermaker_name);
+            DBMS_OUTPUT.PUT(' ');
+            v_return := p_rating.f_beermaker(i.beermaker_id);
+            DBMS_OUTPUT.PUT(v_return);
+            DBMS_OUTPUT.NEW_LINE;
+            
+        END LOOP;
+    END;
+END;
+/
+
+DECLARE
+    x NUMBER;
+    y NUMBER;
+    z NUMBER;
+BEGIN 
+    x := p_rating.f_beer(1);
+    x := p_rating.f_type('blonde');
+    z := p_rating.f_beermaker(5);
+END;
+/
+
+EXECUTE  p_rating.p_beer;
+EXECUTE  p_rating.p_type;
+EXECUTE  p_rating.p_beermaker;
 
 
 
