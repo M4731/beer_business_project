@@ -8,3 +8,6 @@ The point of the project is making a database that represents a beer business. <
   - There are many types of beer. <br/>
   - Every beer has a rating. <br/>
   - Every beer-maker is situated somewhere in a country. <br/>
+
+Here's an image showing how the final database model looks like:
+![](/final_database_model)
